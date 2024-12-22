@@ -1,5 +1,4 @@
 from setting import *
-from player import Player
 from sprite import *
 
 class Game():
