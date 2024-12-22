@@ -1,11 +1,12 @@
 from setting import *
+from random import choice,uniform
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self,pos, *groups):
         super().__init__(*groups)
-        self.image = pygame.Surface(SIZE['paddle'])
-        self.image.fill(COLORS['paddle'])
+        self.image = pygame.Surface(SIZE['paddle'],pygame.SRCALPHA)
+        pygame.draw.rect(self.image,COLORS['paddle'],pygame.FRect((0,0),SIZE['paddle']),0,4)
         self.rect = self.image.get_frect(center = pos)
         self.dir = 0
         self.speed = SPEED['player']
@@ -25,28 +26,35 @@ class Player(pygame.sprite.Sprite):
 
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, *groups):
+    def __init__(self, paddle_sprites,*groups):
         super().__init__(*groups)
-        self.image = pygame.Surface(SIZE['ball'])
-        self.image.fill(COLORS['ball'])
-        self.rect = self.image.get_frect(center = (WINDOW_WIDTH/2,50))
-        self.dir = pygame.Vector2(2,1)
+        self.image = pygame.Surface(SIZE['ball'],pygame.SRCALPHA)
+        pygame.draw.circle(self.image,COLORS['ball'],(SIZE['ball'][0]/2,SIZE['ball'][1]/2),SIZE['ball'][0]/2)
+        self.rect = self.image.get_frect(center = (WINDOW_WIDTH/2,WINDOW_HEIGHT/2))
+        self.dir = pygame.Vector2(choice((1,-1)),uniform(0.7,0.8) * choice((1,-1)))
         self.speed = SPEED['ball']
 
     def move(self,dt):
         self.rect.center += self.dir * self.speed * dt
 
-    def collision_screen(self):
-        if self.rect.right >= WINDOW_WIDTH:
-            self.dir.x = self.dir.x * -1
-            self.rect.right = WINDOW_WIDTH
+    def wall_collision(self):
         if self.rect.top <= 0:
-            self.dir.y = self.dir.y * -1
             self.rect.top = 0
+            self.dir.y *= -1
+
         if self.rect.bottom >= WINDOW_HEIGHT:
-            self.dir.y = self.dir.y * -1
+            self.rect.bottom = WINDOW_HEIGHT
+            self.dir.y *= -1
+
+        if self.rect.right >= WINDOW_WIDTH:
+            self.rect.right = WINDOW_WIDTH
+            self.dir.x *= -1
+
         if self.rect.left <= 0:
-            self.dir.x = self.dir.x * -1
+            self.rect.left = 0
+            self.dir.x *= -1
+
+
     def update(self, dt):
         self.move(dt)
-        self.collision_screen()
+        self.wall_collision()

@@ -16,7 +16,7 @@ class Game():
 
         #sprite
         self.player = Player(POS['player'],(self.all_sprites,self.paddle_sprites))
-        self.ball = Ball(self.all_sprites)
+        self.ball = Ball(self.player,self.all_sprites)
 
     def start_game(self):
         while self.running:
